@@ -47,6 +47,7 @@ public class MinesweeperGUI {
     
     private User user; // the user of the current game
     private DBUserTable db;
+    private DBUserScores score;
 
     // CONSTRUCTOR
     public MinesweeperGUI() {
@@ -249,12 +250,12 @@ public class MinesweeperGUI {
                         String number = "" + proximityNum;
                         if (proximityNum == -1) { // if the tile is a mine, game over
                             number = "*";
-                            db.updateUserLosses(user); // update losses
+                            score.updateUserLosses(user); // update losses
                             user = db.getCurrentUser(user.getUsername()); // get the current user wins and losses from the database
                             
                             gp.revealAll();
                             winLoseText.setText("You Lose!");
-                            totalGamesText.setText("You've won "+user.getWins()+" and lost "+user.getLosses()+" games in total.");
+                            totalGamesText.setText("You've won "+user.getWins()+" games and lost "+user.getLosses()+" games in total.");
                         } else if (proximityNum == 0) { // if the tile is empty, reveal adjacent empty tiles
                             gp.revealEmptyTiles(fi, fj);
                             number = " ";
@@ -264,12 +265,12 @@ public class MinesweeperGUI {
 
                         // Check if won
                         if (gp.checkWin()) {
-                            db.updateUserWins(user); // update wins
+                            score.updateUserWins(user); // update wins
                             user = db.getCurrentUser(user.getUsername()); // get the current user wins and losses from the database
                             
                             gp.revealAll();
                             winLoseText.setText("You win!");
-                            totalGamesText.setText("You've won "+user.getWins()+" and lost "+user.getLosses()+" games in total.");
+                            totalGamesText.setText("You've won "+user.getWins()+" games and lost "+user.getLosses()+" games in total.");
                         }
                     }
                 });
@@ -296,7 +297,7 @@ public class MinesweeperGUI {
         JLabel winLoseText = new JLabel(" ");
         winLoseText.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         
-        JLabel totalGamesText = new JLabel("You've won "+user.getWins()+" and lost "+user.getLosses()+" games in total.");
+        JLabel totalGamesText = new JLabel("You've won "+user.getWins()+" games and lost "+user.getLosses()+" games in total.");
         
         totalGamesText.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         menuButton3 = new JButton("Menu");

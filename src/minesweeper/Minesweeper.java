@@ -11,6 +11,6 @@ package minesweeper;
  */
 public class Minesweeper {
     public static void main(String[] args) {
-        MinesweeperGUI v = new MinesweeperGUI();
+        MinesweeperGUI minesweeper = new MinesweeperGUI();
     }
 }

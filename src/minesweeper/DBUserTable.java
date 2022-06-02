@@ -16,7 +16,8 @@ import java.sql.Statement;
  * @author Alessandra
  */
 public class DBUserTable {
-
+    // For table creation and user creation and getting the current user
+    
     private final DBConnection dbConnection;
     private final Connection connection;
     private Statement statement;
@@ -25,6 +26,18 @@ public class DBUserTable {
         dbConnection = new DBConnection(); // establish connection
         connection = dbConnection.getConnection();
         createUsersTable();
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public Statement getStatement() {
+        return statement;
+    }
+
+    public void setStatement(Statement statement) {
+        this.statement = statement;
     }
 
     /**
@@ -62,76 +75,7 @@ public class DBUserTable {
         }
     }
 
-    /**
-     * Update the current user's wins by incrementing 1
-     *
-     * @param user
-     */
-    public void updateUserWins(User user) {
-        try {
-            statement = connection.createStatement();
-            String sql = "UPDATE USERS SET WINS = "+(user.getWins()+1)+" WHERE USERNAME = '"+user.getUsername()+"'";
-            statement.executeUpdate(sql);
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
     
-    /**
-     * Update the current user's losses by incrementing 1
-     *
-     * @param user
-     */
-    public void updateUserLosses(User user) {
-        try {
-            statement = connection.createStatement();
-            String sql = "UPDATE USERS SET LOSSES = "+(user.getLosses()+1)+" WHERE USERNAME = '"+user.getUsername()+"'";
-            statement.executeUpdate(sql);
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    /**
-     * Returns the number of the user's wins from the database.
-     * @param user
-     * @return 
-     */
-    public int getUserWins(User user) {
-        int wins = 0;
-        try {
-            statement = connection.createStatement();
-            String sql = "SELECT WINS FROM USERS WHERE USERNAME = '" + user.getUsername() + "'";
-            ResultSet rs = statement.executeQuery(sql);
-            while (rs.next()) {
-                wins = rs.getInt("WINS");
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-
-        return wins;
-    }
-
-    /**
-     * Returns the number of the user's losses from the database.
-     * @param user
-     * @return 
-     */
-    public int getUserLosses(User user) {
-        int losses = 0;
-        try {
-            statement = connection.createStatement();
-            String sql = "SELECT LOSSES FROM USERS WHERE USERNAME = '" + user.getUsername() + "'";
-            ResultSet rs = statement.executeQuery(sql);
-            while (rs.next()) {
-                losses = rs.getInt("LOSSES");
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-        return losses;
-    }
 
     /**
      * Returns true if the table already exists
