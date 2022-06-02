@@ -75,8 +75,6 @@ public class DBUserTable {
         }
     }
 
-    
-
     /**
      * Returns true if the table already exists
      *
@@ -92,7 +90,7 @@ public class DBUserTable {
             while (rs.next()) {
                 String table_name = rs.getString("TABLE_NAME");
                 if (table_name.equalsIgnoreCase(tableName)) {
-                    System.out.println("Table already exists...");
+                    System.out.println("USERS table already exists...");
                     return true;
                 }
             }
@@ -150,5 +148,16 @@ public class DBUserTable {
         }
 
         return user;
+    }
+    
+    public void closeDB() {
+        if (connection != null) {
+            try {
+                connection.close();
+                System.out.println("Connection closed!");
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
     }
 }

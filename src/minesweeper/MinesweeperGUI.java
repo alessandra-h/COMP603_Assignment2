@@ -11,6 +11,8 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -36,24 +38,25 @@ public class MinesweeperGUI {
     private JButton menuButton1;
     private JButton menuButton2;
     private JButton menuButton3;
-    
+
     // Constant variables for the difficulty of the field creation
     private static final int EASY = 6;
     private static final int MEDIUM = 8;
     private static final int HARD = 10;
-    
+
     private final Gameplay gp;
     private int size;
-    
+
     private User user; // the user of the current game
     private DBUserTable db;
     private DBUserScores score;
 
     // CONSTRUCTOR
-    public MinesweeperGUI() {
-        gp = new Gameplay();
-        db = new DBUserTable();
-        
+    public MinesweeperGUI(Gameplay gp, DBUserTable db) {
+        this.gp = gp;
+        this.db = db;
+        score = new DBUserScores();
+
         menu();
         instructions();
         chooseDifficulty();
@@ -100,6 +103,7 @@ public class MinesweeperGUI {
         menuFrame.add(buttonsPanel, BorderLayout.CENTER);
         //----------------------------------------------------------------------
 
+        menuFrame.addWindowListener(new closeWindowAdapter());
         menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         menuFrame.setLocationRelativeTo(null);
         menuFrame.setVisible(true);
@@ -151,6 +155,7 @@ public class MinesweeperGUI {
         //----------------------------------------------------------------------
 
         instructionsFrame.setLocationRelativeTo(null);
+        instructionsFrame.addWindowListener(new closeWindowAdapter());
         instructionsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -220,6 +225,7 @@ public class MinesweeperGUI {
         //----------------------------------------------------------------------
 
         difficultyFrame.setLocationRelativeTo(null);
+        difficultyFrame.addWindowListener(new closeWindowAdapter());
         difficultyFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -252,10 +258,10 @@ public class MinesweeperGUI {
                             number = "*";
                             score.updateUserLosses(user); // update losses
                             user = db.getCurrentUser(user.getUsername()); // get the current user wins and losses from the database
-                            
+
                             gp.revealAll();
                             winLoseText.setText("You Lose!");
-                            totalGamesText.setText("You've won "+user.getWins()+" games and lost "+user.getLosses()+" games in total.");
+                            totalGamesText.setText("You've won " + user.getWins() + " games and lost " + user.getLosses() + " games in total.");
                         } else if (proximityNum == 0) { // if the tile is empty, reveal adjacent empty tiles
                             gp.revealEmptyTiles(fi, fj);
                             number = " ";
@@ -267,10 +273,10 @@ public class MinesweeperGUI {
                         if (gp.checkWin()) {
                             score.updateUserWins(user); // update wins
                             user = db.getCurrentUser(user.getUsername()); // get the current user wins and losses from the database
-                            
+
                             gp.revealAll();
                             winLoseText.setText("You win!");
-                            totalGamesText.setText("You've won "+user.getWins()+" games and lost "+user.getLosses()+" games in total.");
+                            totalGamesText.setText("You've won " + user.getWins() + " games and lost " + user.getLosses() + " games in total.");
                         }
                     }
                 });
@@ -296,9 +302,9 @@ public class MinesweeperGUI {
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         JLabel winLoseText = new JLabel(" ");
         winLoseText.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        
-        JLabel totalGamesText = new JLabel("You've won "+user.getWins()+" games and lost "+user.getLosses()+" games in total.");
-        
+
+        JLabel totalGamesText = new JLabel("You've won " + user.getWins() + " games and lost " + user.getLosses() + " games in total.");
+
         totalGamesText.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         menuButton3 = new JButton("Menu");
         menuButton3.setAlignmentX(JLabel.CENTER_ALIGNMENT);
@@ -329,10 +335,11 @@ public class MinesweeperGUI {
         //----------------------------------------------------------------------
 
         gameFrame.setLocationRelativeTo(null);
+        gameFrame.addWindowListener(new closeWindowAdapter());
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    // PRIVATE ACTIONLISTENER CLASSES
+    // PRIVATE LISTENER CLASSES
     
     private class difficultyListener implements ActionListener {
         // Get references of the textfield and label
@@ -367,7 +374,7 @@ public class MinesweeperGUI {
                 String username = promptUsername.getText();
                 // Add the user to the database if they don't already exist
                 if (!db.ifUserExists(username)) {
-                    System.out.println("Creating a new user "+ username);
+                    System.out.println("Creating a new user " + username);
                     user = gp.createUser(username); // the newly created user is the current user
                     db.addUserToTable(user);
                 } else {
@@ -398,6 +405,14 @@ public class MinesweeperGUI {
             } else if (source == menuButton3) {
                 gameFrame.setVisible(false);
             }
+        }
+    }
+
+    private class closeWindowAdapter extends WindowAdapter {
+        // This will close the database connection after the frame is closed
+        public void windowClosing(WindowEvent e) {
+            super.windowClosing(e);
+            db.closeDB();
         }
     }
 }

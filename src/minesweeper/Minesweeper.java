@@ -10,7 +10,29 @@ package minesweeper;
  * @author Alessandra
  */
 public class Minesweeper {
+    private final MinesweeperGUI gui;
+    private final Gameplay gp;
+    private final DBUserTable db;
+    
+    public Minesweeper() {
+        gp = new Gameplay();
+        db = new DBUserTable();
+        gui = new MinesweeperGUI(gp, db);
+    }
+
+    public MinesweeperGUI getGui() {
+        return gui;
+    }
+
+    public Gameplay getGp() {
+        return gp;
+    }
+
+    public DBUserTable getDb() {
+        return db;
+    }
+
     public static void main(String[] args) {
-        MinesweeperGUI minesweeper = new MinesweeperGUI();
+        Minesweeper minesweeper = new Minesweeper();
     }
 }
