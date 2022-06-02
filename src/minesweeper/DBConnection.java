@@ -8,8 +8,6 @@ package minesweeper;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -50,10 +48,5 @@ public class DBConnection {
                 System.out.println(ex.getMessage());
             }
         }
-    }
-    
-    public static void main(String[] args) {
-        DBConnection db = new DBConnection();
-        
     }
 }

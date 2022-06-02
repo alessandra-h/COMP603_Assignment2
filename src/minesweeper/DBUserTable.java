@@ -60,7 +60,6 @@ public class DBUserTable {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
-
     }
 
     /**
@@ -72,7 +71,6 @@ public class DBUserTable {
         try {
             statement = connection.createStatement();
             String sql = "UPDATE USERS SET WINS = "+(user.getWins()+1)+" WHERE USERNAME = '"+user.getUsername()+"'";
-            System.out.println(sql);
             statement.executeUpdate(sql);
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -94,6 +92,11 @@ public class DBUserTable {
         }
     }
 
+    /**
+     * Returns the number of the user's wins from the database.
+     * @param user
+     * @return 
+     */
     public int getUserWins(User user) {
         int wins = 0;
         try {
@@ -110,6 +113,11 @@ public class DBUserTable {
         return wins;
     }
 
+    /**
+     * Returns the number of the user's losses from the database.
+     * @param user
+     * @return 
+     */
     public int getUserLosses(User user) {
         int losses = 0;
         try {
@@ -198,23 +206,5 @@ public class DBUserTable {
         }
 
         return user;
-    }
-
-    public void delete() throws SQLException {
-        statement = connection.createStatement();
-        statement.executeUpdate("Drop table USERS");
-    }
-
-    // Testing purposes
-    public static void main(String[] args) {
-        DBUserTable db = new DBUserTable();
-        //System.out.println(db.ifUserExists("ilovedogs"));
-        //db.addUserToTable(new User("test", 4, 3));
-        //System.out.println(db.ifUserExists("test"));
-//        User user = new User("test", 4, 3);
-//        System.out.println(db.getUserWins(user));
-//        //db.getUserLosses(user);
-//        db.updateUserWins(user);
-//        System.out.println(db.getUserWins(user));
     }
 }

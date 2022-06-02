@@ -42,15 +42,32 @@ public class Gameplay {
     }
     
     // Methods to help play game
+    
+    /**
+     * Returns true if the button at the indicated index has already been revealed.
+     *
+     * @return
+     */
     public boolean isVisible(int i, int j) {
         return (buttonField[i][j]).getText().equals("?");
     }
 
+    /**
+     * Returns true if position in the real field is valid.
+     *
+     * @param position
+     * @return
+     */
     public boolean isValidPosition(Position position) {
         return (position.getRow() >= 0 && position.getRow() < realField.getFieldSize()
                 && position.getColumn() >= 0 && position.getColumn() < realField.getFieldSize());
     }
 
+    /**
+     * Reveal empty tiles in proximity, recursively.
+     *
+     * @param tile
+     */
     public void revealEmptyTiles(int i, int j) {
         for (int offsetX = i - 1; offsetX <= i + 1; offsetX++) {
             for (int offsetY = j - 1; offsetY <= j + 1; offsetY++) {
@@ -69,9 +86,14 @@ public class Gameplay {
         }
     }
 
+    /**
+     * Returns true if board is complete.
+     *
+     * @return
+     */
     public boolean checkWin() {
         // Count number of unknown tiles. 
-        int count = -1;
+        int count = 0;
         for (JButton[] buttonRow : buttonField) {
             for (JButton button : buttonRow) {
                 if (button.getText().equals("?")) {
@@ -83,6 +105,9 @@ public class Gameplay {
         return count == realField.getNumMines();
     }
 
+    /**
+     * Reveal the entire board of the button field.
+     */
     public void revealAll() {
         for (int i = 0; i < realField.getFieldSize(); i++) {
             for (int j = 0; j < realField.getFieldSize(); j++) {
@@ -101,5 +126,13 @@ public class Gameplay {
         }
     }
     
-    // public User create user?
+    /**
+     * Creates a new User object with the given username
+     * @param username
+     * @return 
+     */
+    public User createUser(String username) {
+        User newUser = new User(username, 0, 0);
+        return newUser;
+    }
 }

@@ -22,7 +22,7 @@ import javax.swing.JTextField;
  *
  * @author Alessandra
  */
-public class UserView {
+public class MinesweeperGUI {
 
     private JFrame instructionsFrame;
     private JFrame menuFrame;
@@ -36,13 +36,23 @@ public class UserView {
     private JButton menuButton1;
     private JButton menuButton2;
     private JButton menuButton3;
-
+    
+    // Constant variables for the difficulty of the field creation
+    private static final int EASY = 6;
+    private static final int MEDIUM = 8;
+    private static final int HARD = 10;
+    
     private final Gameplay gp;
     private int size;
+    
+    private User user; // the user of the current game
+    private DBUserTable db;
 
     // CONSTRUCTOR
-    public UserView() {
+    public MinesweeperGUI() {
         gp = new Gameplay();
+        db = new DBUserTable();
+        
         menu();
         instructions();
         chooseDifficulty();
@@ -212,7 +222,7 @@ public class UserView {
         difficultyFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void createButtonField(JLabel winLoseText) {
+    public void createButtonField(JLabel winLoseText, JLabel totalGamesText) {
         gp.setRealField(new HiddenField(size)); // create a new field of mines in the 2d array
         gp.setSize(size);
 
@@ -232,7 +242,6 @@ public class UserView {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         JButton src = (JButton) e.getSource();
-
                         // Get the number of mines near of the corresponding tile to the button
                         int proximityNum = gp.getRealField().getField()[fi][fj].getMinesNear();
 
@@ -240,9 +249,12 @@ public class UserView {
                         String number = "" + proximityNum;
                         if (proximityNum == -1) { // if the tile is a mine, game over
                             number = "*";
+                            db.updateUserLosses(user); // update losses
+                            user = db.getCurrentUser(user.getUsername()); // get the current user wins and losses from the database
+                            
                             gp.revealAll();
                             winLoseText.setText("You Lose!");
-                            // The youve won text
+                            totalGamesText.setText("You've won "+user.getWins()+" and lost "+user.getLosses()+" games in total.");
                         } else if (proximityNum == 0) { // if the tile is empty, reveal adjacent empty tiles
                             gp.revealEmptyTiles(fi, fj);
                             number = " ";
@@ -252,8 +264,12 @@ public class UserView {
 
                         // Check if won
                         if (gp.checkWin()) {
-                            winLoseText.setText("You win!");
+                            db.updateUserWins(user); // update wins
+                            user = db.getCurrentUser(user.getUsername()); // get the current user wins and losses from the database
+                            
                             gp.revealAll();
+                            winLoseText.setText("You win!");
+                            totalGamesText.setText("You've won "+user.getWins()+" and lost "+user.getLosses()+" games in total.");
                         }
                     }
                 });
@@ -277,9 +293,11 @@ public class UserView {
         JPanel bottomPanel = new JPanel();
         bottomPanel.setPreferredSize(new Dimension(100, 100));
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
-        JLabel winLoseText = new JLabel("Neutral");
+        JLabel winLoseText = new JLabel(" ");
         winLoseText.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        JLabel totalGamesText = new JLabel("You've won 0 games and lost 0 games.");
+        
+        JLabel totalGamesText = new JLabel("You've won "+user.getWins()+" and lost "+user.getLosses()+" games in total.");
+        
         totalGamesText.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         menuButton3 = new JButton("Menu");
         menuButton3.setAlignmentX(JLabel.CENTER_ALIGNMENT);
@@ -291,7 +309,7 @@ public class UserView {
         gameFrame.add(bottomPanel, BorderLayout.SOUTH);
         //----------------------------------------------------------------------
 
-        createButtonField(winLoseText);
+        createButtonField(winLoseText, totalGamesText);
 
         // Create restart panel that holds a restart button
         JPanel restartPanel = new JPanel();
@@ -314,6 +332,7 @@ public class UserView {
     }
 
     // PRIVATE ACTIONLISTENER CLASSES
+    
     private class difficultyListener implements ActionListener {
         // Get references of the textfield and label
         private JTextField promptUsername;
@@ -326,28 +345,33 @@ public class UserView {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
             if (promptUsername.getText().equals("")) { // if the prompt textfield is empty
                 System.out.println("Invalid! User must enter a username before proceeding");
                 invalidText.setText("Please enter a username");
-            } else if (promptUsername.getText().length() > 10) { // else if the username is longer than 10 chars 
-                System.out.println("Invalid! User must enter a username less than or equal to 10 characters");
-                invalidText.setText("Please enter a username less than or equal to 10 characters");
+            } else if (promptUsername.getText().length() > 16) { // else if the username is longer than 16 chars 
+                System.out.println("Invalid! User must enter a username less than or equal to 16 characters");
+                invalidText.setText("Please enter a username less than or equal to 16 characters");
             } else {
                 Object source = e.getSource();
                 // Set the size of the field accordingly to the difficulty
                 if (source == easy) {
-                    size = 6;
+                    size = EASY;
                 } else if (source == medium) {
-                    size = 8;
+                    size = MEDIUM;
                 } else {
-                    size = 10;
+                    size = HARD;
                 }
 
                 // Get the username of the prompt textfield
-                // use database thing!
                 String username = promptUsername.getText();
-                System.out.println(username);
+                // Add the user to the database if they don't already exist
+                if (!db.ifUserExists(username)) {
+                    System.out.println("Creating a new user "+ username);
+                    user = gp.createUser(username); // the newly created user is the current user
+                    db.addUserToTable(user);
+                } else {
+                    user = db.getCurrentUser(username); // the current user data is extracted from the database
+                }
 
                 // Run the minesweeperGame() function to create the frame and hide this frame after
                 minesweeperGame();
@@ -360,7 +384,6 @@ public class UserView {
     }
 
     private class menuListener implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
             Object source = e.getSource();
@@ -375,11 +398,5 @@ public class UserView {
                 gameFrame.setVisible(false);
             }
         }
-    }
-
-    //---------------------------------------------
-    public static void main(String[] args) {
-
-        UserView v = new UserView();
     }
 }
