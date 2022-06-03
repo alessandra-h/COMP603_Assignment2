@@ -254,7 +254,7 @@ public class MinesweeperGUI {
 
                         // Update the button's text accordingly
                         String number = "" + proximityNum;
-                        if (proximityNum == -1) { // if the tile is a mine, game over
+                        if (proximityNum == State.MINE.getNumber()) { // if the tile is a mine, game over
                             number = "*";
                             score.updateUserLosses(user); // update losses
                             user = db.getCurrentUser(user.getUsername()); // get the current user wins and losses from the database
@@ -262,7 +262,7 @@ public class MinesweeperGUI {
                             gp.revealAll();
                             winLoseText.setText("You Lose!");
                             totalGamesText.setText("You've won " + user.getWins() + " games and lost " + user.getLosses() + " games in total.");
-                        } else if (proximityNum == 0) { // if the tile is empty, reveal adjacent empty tiles
+                        } else if (proximityNum == State.EMPTY.getNumber()) { // if the tile is empty, reveal adjacent empty tiles
                             gp.revealEmptyTiles(fi, fj);
                             number = " ";
                         }
@@ -339,7 +339,7 @@ public class MinesweeperGUI {
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    // PRIVATE LISTENER CLASSES
+    // PRIVATE LISTENER CLASSES BELOW
     
     private class difficultyListener implements ActionListener {
         // Get references of the textfield and label
@@ -410,6 +410,7 @@ public class MinesweeperGUI {
 
     private class closeWindowAdapter extends WindowAdapter {
         // This will close the database connection after the frame is closed
+        @Override
         public void windowClosing(WindowEvent e) {
             super.windowClosing(e);
             db.closeDB();

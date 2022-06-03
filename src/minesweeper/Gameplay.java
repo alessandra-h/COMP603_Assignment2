@@ -114,9 +114,9 @@ public class Gameplay {
                 if (buttonField[i][j].getText().equals("?")) {
                     int proximityNum = realField.getField()[i][j].getMinesNear();
                     String number = "" + proximityNum;
-                    if (proximityNum == -1) {
+                    if (proximityNum == State.MINE.getNumber()) {
                         number = "*";
-                    } else if (proximityNum == 0) {
+                    } else if (proximityNum == State.EMPTY.getNumber()) {
                         number = " ";
                     }
                     buttonField[i][j].setText(number);
