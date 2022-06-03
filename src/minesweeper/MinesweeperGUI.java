@@ -254,7 +254,7 @@ public class MinesweeperGUI {
 
                         // Update the button's text accordingly
                         String number = "" + proximityNum;
-                        if (proximityNum == State.MINE.getNumber()) { // if the tile is a mine, game over
+                        if (gp.checkMine(fi, fj)) { // if the tile is a mine, game over
                             number = "*";
                             score.updateUserLosses(user); // update losses
                             user = db.getCurrentUser(user.getUsername()); // get the current user wins and losses from the database

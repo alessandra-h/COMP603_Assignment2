@@ -150,14 +150,17 @@ public class DBUserTable {
         return user;
     }
     
-    public void closeDB() {
+    public boolean closeDB() {
         if (connection != null) {
             try {
                 connection.close();
                 System.out.println("Connection closed!");
+                return true;
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
         }
+        
+        return false;
     }
 }

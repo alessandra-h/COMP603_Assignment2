@@ -106,6 +106,17 @@ public class Gameplay {
     }
 
     /**
+     * Returns true if the tile at the index is a mine.
+     * @return
+     */
+    public boolean checkMine(int i, int j) {
+        if (realField.getField()[i][j].getMinesNear() == State.MINE.getNumber()) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
      * Reveal the entire board of the button field.
      */
     public void revealAll() {
